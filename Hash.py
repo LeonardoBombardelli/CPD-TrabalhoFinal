@@ -1,10 +1,10 @@
 class Hash:
-    """This hash dealswith colisions simply by appending the colision in a list. This way, we will need to rehash everytime we
+    """This hash deals with colisions simply by appending the colision in a list. This way, we will need to rehash everytime we
     get a list with too much keys, to avoid a linear search in the hash."""
     def __init__(self):
-        self.Codification = 137 #Number in which we will codify all information
-        self.Keys = [[] for i in range(137)]  #Each key will be in a array of arrays.
-        self.Objects = [[] for i in range(137)] #Each object corresponds to a key
+        self.Codification = 2 #Number in which we will codify all information
+        self.Keys = [[] for i in range(self.Codification)]  #Each key will be in a array of arrays.
+        self.Objects = [[] for i in range(self.Codification)] #Each object corresponds to a key
         self.MaxLenBucket = 5
 
 
@@ -61,9 +61,9 @@ class Hash:
         ListObjects = []
 
         for Bucket in self.Keys:
-            for Key in self.Keys[Bucket]:
+            for Key in Bucket:
                 ListKeys.append(Key)
-                List.Keys.append(self.Check(Key))
+                ListObjects.append(self.Check(Key))
 
         for Key in ListKeys:
             self.Remove(Key)
@@ -78,6 +78,14 @@ class Hash:
 
 Reshi = Hash()
 Reshi.Append('a', 'a')
-Reshi.Remove('a')
-print(Reshi.Objects)
+Reshi.Append('b', 'b')
+Reshi.Append('c', 'd')
+Reshi.Append('c', 'c')
+Reshi.Append('e', 'e')
+Reshi.Append('g', 'g')
+Reshi.Append('i', 'i')
+Reshi.Append('k', 'k')
+Reshi.Append('l', 'l')
+
 print(Reshi.Keys)
+print(Reshi.Objects)
