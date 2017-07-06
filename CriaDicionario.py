@@ -41,7 +41,7 @@ class DictAndText:
         self.Dictionary = Dictionary
         self.NextIndex = NextIndex #Contador de quantos tweets foram lidos ate entao.
         self.TextFile = "BufferText.txt" #Será guardado nesse arquivo os tweets lidos.
-        self.MemoDictionary = "BufferDict.txt" #Será guardado nesse arquivo o conteudo do dicionario
+
 
     def ReturnsNegativeTweets(self, Word):
         """Retorna uma lista com todos os tweets negativos"""
@@ -160,21 +160,47 @@ def PredictFeelings(Dictionary):
         ListToReturn.append([Tweet, str(SumOfValue)])
     WriteCSV(ListToReturn)
 
+#-----------------------------------------------------------------------------------------------------------------#
+#-------------------------------------Map Tweets Operations-------------------------------------------------------#
 
+def PassTweetsToCSV(Value, ListTweets):
+    """Recebe uma lista de Tweets e um sentimento, forma uma tupla [tweet, sentimento] e passa tudo para WriteCSV"""
+    ListtoPass = []
+    for tweet in ListTweets:
+        ListtoPass.append([tweet, Value])
+    WriteCSV(ListtoPass)
+
+def PassTweetsWithoutValue(Word, Dictionary):
+    """Passa todos os tweets e chama WriteCSV direto"""
+    ListToPass = []
+    Temp = Dictionary.ReturnsPositiveTweets(Word)
+    for tweet in Temp:
+        ListToPass.append([tweet, 1])
+    Temp = Dictionary.ReturnsNegativeTweets(Word)
+    for tweet in Temp:
+        ListToPass.append([tweet, -1])
+    Temp = Dictionary.ReturnsNeutralTweets(Word)
+    for tweet in Temp:
+        ListToPass.append([tweet, 0])
+    WriteCSV(ListToPass)
 
 #-----------------------------------------------------------------------------------------------------------------#
-#-----------------------------------------------------------------------------------------------------------------#
+#------------------------------------Debugging only---------------------------------------------------------------#
 #-----------------------------------------------------------------------------------------------------------------#
 
 if __name__ == "__main__":  #Debug only
     AllInAll = GetInitialFile()
-    PredictFeelings(AllInAll.Dictionary)
+    #PredictFeelings(AllInAll.Dictionary)
+    """
     AllInAll = GetAnotherFile(AllInAll)
     PredictFeelings(AllInAll.Dictionary)
+    """
 
     Word = input("Insira palavra a buscar: ")
-    print("Positivas: ")
+    PassTweetsWithoutValue(Word, AllInAll)
+    """print("Positivas: ")
     output = AllInAll.ReturnsPositiveTweets(Word)
+    PassTweetsToCSV(1, output)
     for i in output:
         print(i)
     print()
@@ -193,7 +219,7 @@ if __name__ == "__main__":  #Debug only
     #Text= AllInAll.ReturnsAllAppears('microsoft')
     #PredictFeelings(AllInAll.Dictionary)
 
-    """print("Negative: ")
+    print("Negative: ")
     print()
     for i in Text:
         print(i)

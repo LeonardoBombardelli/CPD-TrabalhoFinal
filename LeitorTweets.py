@@ -71,6 +71,7 @@ def WriteCSV(DataToWrite):
     Writer = csv.writer(OutFile)
     Writer.writerows(DataToWrite)
     OutFile.close()
+    print("Conteudo armazenado em Output" + str(Counter) +'.csv')
 
 if __name__ == "__main__":  #Debug only
     Data = [["Eu nao aguento mais", "-1"], ["Eu nao aguento mais mesmo", "-1"], ["AAAAAAAAAAAAAAAAAaaaaaaa", "1"]]
