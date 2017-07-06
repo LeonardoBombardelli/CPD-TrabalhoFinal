@@ -41,6 +41,21 @@ def GetTextToRate():
             print("Insira um arquivo presente no diretorio")
     return FileContent
 
+def WriteTXT(Text, Mode, FileName):
+    with open(FileName, Mode, encoding = 'utf-8') as Output:    #Mode = 'w' for overwrite, 'a' for append
+        for tweet in Text:
+            Output.write(tweet[0] + '\n')
+    Output.close()
+
+def GetTXT(FileName):
+    try:
+        with open(FileName, encoding = 'utf-8') as FileToRead:
+            FileContent = FileToRead.read()
+        FileToRead.closed
+        return FileContent
+    except FileNotFoundError:
+        print("Arquivo " + FileName + " nao esta presente no diretorio!")
+
 def WriteCSV(DataToWrite):
     """Recebe um array de arrays e cria um arquivo .csv com esses dados"""
     #Primeiro, tentamos nao fazer um overwrite de conteudos anteriores

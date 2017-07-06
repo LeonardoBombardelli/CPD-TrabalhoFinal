@@ -3,7 +3,7 @@
 import re
 
 from Hash import Hash
-from LeitorTweets import GetFileContent, GetTextToRate, WriteCSV
+from LeitorTweets import GetFileContent, GetTextToRate, WriteCSV, WriteTXT, GetTXT
 
 #-----------------------------------------------------------------------------------------------------------------#
 #----------------------------------------------Objects------------------------------------------------------------#
@@ -37,28 +37,42 @@ class KeyContent:
 class DictAndText:
     """Estrutura que contem o hash e uma lista de tweets associado a ele.
     Importante para a implementacao da funcionalidade de mostrar em que tweets aparece cada palavra"""
-    def __init__(self, Dictionary, Text, NextIndex):
+    def __init__(self, Dictionary, NextIndex):
         self.Dictionary = Dictionary
-        self.Tweets = Text
-        self.NextIndex = NextIndex #Usado para fazer o "arquivo invertido" e mantem um controle sob onde os proximos tweets serao inseridos
+        self.NextIndex = NextIndex #Contador de quantos tweets foram lidos ate entao.
+        self.TextFile = "BufferText.txt" #Será guardado nesse arquivo os tweets lidos.
+        self.MemoDictionary = "BufferDict.txt" #Será guardado nesse arquivo o conteudo do dicionario
 
     def ReturnsNegativeTweets(self, Word):
+        """Retorna uma lista com todos os tweets negativos"""
+        Tweets = GetTXT(self.TextFile)
+        Tweets = Tweets.split('\n') #Cria uma lista de strings, cada elemento com um tweet.
         ReturnList = []
         for i in self.Dictionary.Check(Word).NegativeAppear:
-            ReturnList.append(self.Tweets[i][0])
+            ReturnList.append(Tweets[i])
         return ReturnList
 
     def ReturnsPositiveTweets(self, Word):
+        """Retorna uma lista com todos os tweets positivos"""
+        Tweets = GetTXT(self.TextFile)
+        Tweets = Tweets.split('\n') #Cria uma lista de strings, cada elemento com um tweet.
         ReturnList = []
         for i in self.Dictionary.Check(Word).PositiveAppear:
-            ReturnList.append(self.Tweets[i][0])
+            ReturnList.append(Tweets[i])
         return ReturnList
 
     def ReturnsNeutralTweets(self, Word):
+        """Retorna uma lista com todos os tweets neutros"""
+        Tweets = GetTXT(self.TextFile)
+        Tweets = Tweets.split('\n') #Cria uma lista de strings, cada elemento com um tweet.
         ReturnList = []
         for i in self.Dictionary.Check(Word).NeutralAppear:
-            ReturnList.append(self.Tweets[i][0])
+            ReturnList.append(Tweets[i])
         return ReturnList
+
+    def ReturnsAllAppears(self, Word):
+        """Retorna todos os tweets em que Word aparece"""
+        return(self.ReturnsNeutralTweets(Word) + self.ReturnsPositiveTweets(Word) + self.ReturnsNegativeTweets(Word))
 
 #-----------------------------------------------------------------------------------------------------------------#
 #------------------------------------Inserting on Dictionary------------------------------------------------------#
@@ -96,7 +110,8 @@ def GetInitialFile():
         for Word in Temp:
             InsertOnHash(Dictionary ,Word, Value, LocalOnList)
         LocalOnList += 1
-    ReturningValue = DictAndText(Dictionary, StringToPass, LocalOnList)
+    ReturningValue = DictAndText(Dictionary, LocalOnList)
+    WriteTXT(StringToPass, 'w', ReturningValue.TextFile)
     return ReturningValue
 
 def GetAnotherFile(OldDict):
@@ -104,7 +119,7 @@ def GetAnotherFile(OldDict):
     LocalOnList = OldDict.NextIndex
     StringToPass = GetFileContent()
     Dictionary = OldDict.Dictionary
-    TextToReturn = OldDict.Tweets
+    TextToReturn = []
 
     #i = uma linha do documento; i[0] = tweet, i[1] = valor
     for i in StringToPass:
@@ -116,7 +131,8 @@ def GetAnotherFile(OldDict):
             InsertOnHash(Dictionary ,Word, Value, LocalOnList)
         LocalOnList += 1
 
-    ReturningValue = DictAndText(Dictionary, TextToReturn, LocalOnList)
+    ReturningValue = DictAndText(Dictionary, LocalOnList)
+    WriteTXT(TextToReturn, 'a', ReturningValue.TextFile)
     return ReturningValue
 
 #-----------------------------------------------------------------------------------------------------------------#
@@ -152,8 +168,30 @@ def PredictFeelings(Dictionary):
 
 if __name__ == "__main__":  #Debug only
     AllInAll = GetInitialFile()
-    Text= AllInAll.ReturnsNegativeTweets('microsoft')
     PredictFeelings(AllInAll.Dictionary)
+    AllInAll = GetAnotherFile(AllInAll)
+    PredictFeelings(AllInAll.Dictionary)
+
+    Word = input("Insira palavra a buscar: ")
+    print("Positivas: ")
+    output = AllInAll.ReturnsPositiveTweets(Word)
+    for i in output:
+        print(i)
+    print()
+
+    print("Negativas: ")
+    output = AllInAll.ReturnsNegativeTweets(Word)
+    for i in output:
+        print(i)
+    print()
+
+    print("Neutras: ")
+    output = AllInAll.ReturnsNeutralTweets(Word)
+    for i in output:
+        print(i)
+    print()
+    #Text= AllInAll.ReturnsAllAppears('microsoft')
+    #PredictFeelings(AllInAll.Dictionary)
 
     """print("Negative: ")
     print()
