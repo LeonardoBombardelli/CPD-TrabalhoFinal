@@ -2,10 +2,11 @@ class Hash:
     """This hash deals with colisions simply by appending the colision in a list. This way, we will need to rehash everytime we
     get a list with too much keys, to avoid a linear search in the hash."""
     def __init__(self):
-        self.Codification = 2 #Number in which we will codify all information
+        self.Codification = 171 #Number in which we will codify all information
         self.Keys = [[] for i in range(self.Codification)]  #Each key will be in a array of arrays.
         self.Objects = [[] for i in range(self.Codification)] #Each object corresponds to a key
-        self.MaxLenBucket = 5
+        self.MaxLenBucket = 13
+        #self.NumberRehash = 0 !!!Debug only!!!
 
 
     def GetFirstKeyValue(self, Key):
