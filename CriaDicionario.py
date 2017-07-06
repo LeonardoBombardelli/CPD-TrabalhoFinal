@@ -3,7 +3,10 @@
 import re
 
 from Hash import Hash
-from LeitorTweets import GetFileContent
+from LeitorTweets import GetFileContent, GetTextToRate, WriteCSV
+
+#-----------------------------------------------------------------------------------------------------------------#
+#----------------------------------------------Objects------------------------------------------------------------#
 
 class KeyContent:
     """O conteudo presente que sera associado a cada uma das chaves da Hash"""
@@ -28,13 +31,16 @@ class KeyContent:
         self.Freq += 1
         self.Value = self.AccValue / self.Freq
 
+#-----------------------------------------------------------------------------------------------------------------#
+#------------------------------------------Dict and Text----------------------------------------------------------#
+
 class DictAndText:
-    """Estrutura que contera o hash e uma lista de tweets associado a ele.
+    """Estrutura que contem o hash e uma lista de tweets associado a ele.
     Importante para a implementacao da funcionalidade de mostrar em que tweets aparece cada palavra"""
     def __init__(self, Dictionary, Text, NextIndex):
         self.Dictionary = Dictionary
         self.Tweets = Text
-        self.NextIndex = NextIndex
+        self.NextIndex = NextIndex #Usado para fazer o "arquivo invertido" e mantem um controle sob onde os proximos tweets serao inseridos
 
     def ReturnsNegativeTweets(self, Word):
         ReturnList = []
@@ -54,7 +60,8 @@ class DictAndText:
             ReturnList.append(self.Tweets[i][0])
         return ReturnList
 
-
+#-----------------------------------------------------------------------------------------------------------------#
+#------------------------------------Inserting on Dictionary------------------------------------------------------#
 
 def InsertOnHash(Dictionary, Word, Value, LocalOnList):
     Content = Dictionary.Check(Word)
@@ -73,6 +80,9 @@ def AppliesRE(TweetString):
         if len(i) > 3:
             ReturnValue.append(i.lower())
     return ReturnValue
+
+#-----------------------------------------------------------------------------------------------------------------#
+#------------------------------------File Operations--------------------------------------------------------------#
 
 def GetInitialFile():
     """Pega o arquivo inicial e insere seu conteudo numa Hash"""
@@ -96,6 +106,7 @@ def GetAnotherFile(OldDict):
     Dictionary = OldDict.Dictionary
     TextToReturn = OldDict.Tweets
 
+    #i = uma linha do documento; i[0] = tweet, i[1] = valor
     for i in StringToPass:
         TextToReturn.append(i)
         Temp = AppliesRE(i[0])
@@ -108,11 +119,43 @@ def GetAnotherFile(OldDict):
     ReturningValue = DictAndText(Dictionary, TextToReturn, LocalOnList)
     return ReturningValue
 
+#-----------------------------------------------------------------------------------------------------------------#
+#-------------------------------------Predict Operations----------------------------------------------------------#
+
+def PredictFeelings(Dictionary):
+    TweetsToPredict = GetTextToRate()
+    TweetsToPredict = TweetsToPredict.split('\n')
+    ListToReturn = []
+    for Tweet in TweetsToPredict:
+        SumOfValue = 0
+        Temp = AppliesRE(Tweet)
+        for Word in Temp:
+            WordValue = Dictionary.Check(Word) #Dictionary.Check(Word) retornara uma KeyContent
+            if WordValue != False:
+                WordValue = WordValue.Value
+                SumOfValue += WordValue
+
+        if SumOfValue > 0.1:
+            SumOfValue = 1
+        if SumOfValue < -0.1:
+            SumOfValue = -1
+        if SumOfValue <= 0.1 and SumOfValue >= -0.1:
+            SumOfValue = 0
+        ListToReturn.append([Tweet, str(SumOfValue)])
+    WriteCSV(ListToReturn)
+
+
+
+#-----------------------------------------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------------------------------------------#
 
 if __name__ == "__main__":  #Debug only
     AllInAll = GetInitialFile()
     Text= AllInAll.ReturnsNegativeTweets('microsoft')
-    print("Negative: ")
+    PredictFeelings(AllInAll.Dictionary)
+
+    """print("Negative: ")
     print()
     for i in Text:
         print(i)
@@ -127,4 +170,4 @@ if __name__ == "__main__":  #Debug only
     print("Neutral: ")
     print()
     for i in Text:
-        print(i)
+        print(i)"""
