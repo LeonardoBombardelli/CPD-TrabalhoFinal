@@ -78,6 +78,7 @@ class DictAndText:
 #------------------------------------Inserting on Dictionary------------------------------------------------------#
 
 def InsertOnHash(Dictionary, Word, Value, LocalOnList):
+    """Recebe o dicionario, a palavra normalizada, sentimento associado e o indice do tweet"""
     Content = Dictionary.Check(Word)
     if Content == False:
         Content = KeyContent()

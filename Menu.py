@@ -16,11 +16,15 @@ def SubMenu4(Dictionary):
     Word= input("Escolha a palavra: ")
     Word = Word.lower()
     print()
+    if Dictionary.Dictionary.Check(Word) == False:
+        print("Palavra nao presente no dicionario.")
+        return
     print("Escolha:")
     print("1 - Retorna todos os tweets de determinada palavra")
     print("2 - Retorna apenas tweets positivos")
     print("3 - Retorna apenas tweets negativos")
     print("4 - Retorna apenas tweets neutros")
+
 
     Opt = int(input("Insira a opcao: "))
 
